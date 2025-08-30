@@ -14,11 +14,11 @@ const signup = async (req, res) => {
         const userId = await authServices.signup(req.body);
 
         res.status(200).json({
-            id: userId
+            _id: userId
         });
     } catch(err) {
         console.log("Error while creating user: ", err);
-        throw new HttpError(err.message, 500);
+        throw new HttpError(err.message, err.status);
     }
 }
 
@@ -36,8 +36,7 @@ const login = async (req, res) => {
             ).json({ user });
 
     } catch(err) {
-        console.log("Error: ", err);
-        throw new HttpError(err.message, 500);
+        throw new HttpError(err.message, err.status);
     }
 }
 
@@ -53,10 +52,9 @@ const logout = async (req, res) => {
             expires: new Date(Date.now())
         }).json({
             message: "Logout Successfull"
-        })
+        });
     }catch(err) {
-        console.log("Error while logout: ", err);
-        throw new HttpError(err.message, 500);
+        throw new HttpError(err.message, err.status);
     }
 }
 

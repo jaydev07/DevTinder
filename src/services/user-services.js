@@ -1,5 +1,5 @@
 const HttpError = require("../../src/utils/http-error");
-const User = require("../../src/models/User");
+const User = require("../models/User");
 
 const getProfile = async (input) => {
     try {
@@ -22,7 +22,7 @@ const getFeed = async (input) => {
 const editProfile = async (input, userId) => {
     try {
         const user = await User.findOneAndUpdate(
-            { id: userId },
+            { _id: userId },
             {
                 $set: input
             },

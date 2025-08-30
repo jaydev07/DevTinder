@@ -5,12 +5,14 @@ const cookieParser = require("cookie-parser");
 const { connectDB } = require("../src/config/database");
 const authRoutes = require("../src/routes/auth-routes");
 const userRoutes = require("../src/routes/user-routes");
+const connectionRequestRoutes = require("../src/routes/connection-request-routes");
 
 app.use(express.json());
 app.use(cookieParser());
 
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
+app.use("/requests", connectionRequestRoutes);
 
 app.use((req, res) => {
     res.status(404).json({

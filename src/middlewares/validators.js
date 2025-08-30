@@ -1,4 +1,4 @@
-const { body } = require("express-validator");
+const { body, param } = require("express-validator");
 const HttpError = require("../../src/utils/http-error");
 
 const signupValidation = () => {
@@ -19,7 +19,7 @@ const signupValidation = () => {
 const editProfileValadation = () => {
     return [
         body("email")
-            .custom((email) => {
+            .custom(email => {
                 if (email !== undefined) {
                     throw new HttpError("Email should not be updated", 400);
                 }
@@ -31,7 +31,24 @@ const editProfileValadation = () => {
     ]
 }
 
+const sendConnectionRequestValidation = () => {
+    return [
+        param("status")
+            .custom(status => {
+                const validStatus = ['interested', 'ignored'];
+                if (!validStatus.includes(status)) {
+                    throw new HttpError(`Status: ${status} is invalid`)
+                }
+                return true;
+            }),
+
+        param("toUserId")
+            .isMongoId().withMessage("Invalid Mongo userId")
+    ]
+}
+
 module.exports = {
     signupValidation,
-    editProfileValadation
+    editProfileValadation,
+    sendConnectionRequestValidation
 }

@@ -4,10 +4,6 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
 const userSchema = new mongoose.Schema({
-    id: { 
-        type: String,
-        required: true
-    },
     firstName: { 
         type: String,
         required: true,
@@ -38,7 +34,10 @@ const userSchema = new mongoose.Schema({
     },
     gender: {
         type: String,
-        enum: ['Male', 'Female', 'Others'],
+        enum: {
+            values: ['Male', 'Female', 'Others'],
+            message: `{VALUE} is an incorrect gender`
+        }
     },
     photoUrl: {
         type: String,
@@ -53,6 +52,8 @@ const userSchema = new mongoose.Schema({
     timestamps: true
 });
 
+userSchema.index({ firstName: 1, lastName: 1 });
+
 // Mongoose Schema Methods
 // NOTE: Alway with normal function here rather than Array functions
 userSchema.methods.getJWT = async function() {
@@ -60,7 +61,7 @@ userSchema.methods.getJWT = async function() {
     const user = this;
 
     const token = await jwt.sign(
-        { id: user.id }, 
+        { _id: user._id }, 
         'jaydev', 
         {  expiresIn: '1h' }
     );

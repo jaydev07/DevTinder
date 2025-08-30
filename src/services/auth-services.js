@@ -1,8 +1,7 @@
 const bcrypt = require("bcrypt");
-const { ulid } = require("ulid");
 
 const HttpError = require("../../src/utils/http-error");
-const User = require("../../src/models/User");
+const User = require("../models/User");
 
 const signup = async (input) => {
 
@@ -11,7 +10,6 @@ const signup = async (input) => {
         const passwordHash = await bcrypt.hash(input.password, 10);
 
         const newUser = new User({
-            id: ulid(),
             firstName: input.firstName,
             lastName: input?.lastName,
             email: input.email,
@@ -26,7 +24,7 @@ const signup = async (input) => {
 
         await newUser.save();
 
-        return newUser.id;
+        return newUser._id;
     } catch(err) {
         console.log("Error while creating user: ", err);
         throw new HttpError(err.message, 500);

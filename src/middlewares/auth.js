@@ -15,7 +15,7 @@ const userAuth = async (req, res, next) => {
         const verifiedToken = await jwt.verify(token, 'jaydev');
 
         // Checked if the user exists
-        const user = await User.findOne({ id: verifiedToken.id });
+        const user = await User.findById({ _id: verifiedToken._id });
         if (!user) {
             throw new HttpError("User not found, login again", 404);
         }

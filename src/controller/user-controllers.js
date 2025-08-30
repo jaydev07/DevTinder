@@ -8,7 +8,7 @@ const getProfile = async (req, res) => {
         res.status(200).json(user);
     }catch(err) {
         console.log(err);
-        throw new HttpError(err.message, 500);
+        throw new HttpError(err.message, err.status);
     }
 };
 
@@ -17,8 +17,7 @@ const getFeed = async (req, res) => {
         const users = await userServices.getFeed(req);
         res.status(200).json(users);
     } catch(err) {
-        console.log("Error while creating user: ", err.message);
-        throw new HttpError(err.message || "internal Server Error", err.status || 500);
+        throw new HttpError(err.message, err.status);
     }
 };
 
@@ -31,12 +30,12 @@ const editProfile = async (req, res) => {
             throw new HttpError(errors?.array()[0].msg, 400);
         }
 
-        const user = await userServices.editProfile(req.body, req.user.id);
+        const user = await userServices.editProfile(req.body, req.user._id);
 
         res.status(200).json({ user });
     } catch(err) {
         console.log(err.message);
-        throw new HttpError(err.message, 500);
+        throw new HttpError(err.message, err.status);
     }
 };
 
