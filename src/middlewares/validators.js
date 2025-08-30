@@ -1,4 +1,5 @@
 const { body } = require("express-validator");
+const HttpError = require("../../src/utils/http-error");
 
 const signupValidation = () => {
     return [
@@ -15,6 +16,22 @@ const signupValidation = () => {
     ]
 }
 
+const editProfileValadation = () => {
+    return [
+        body("email")
+            .custom((email) => {
+                if (email !== undefined) {
+                    throw new HttpError("Email should not be updated", 400);
+                }
+                return true;
+            }),
+
+        body("password")
+            .not().exists().withMessage("Password should not be updated")
+    ]
+}
+
 module.exports = {
-    signupValidation
+    signupValidation,
+    editProfileValadation
 }

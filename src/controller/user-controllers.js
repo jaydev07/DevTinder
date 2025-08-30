@@ -1,9 +1,10 @@
 const HttpError = require("../../src/utils/http-error");
-const User = require("../../src/models/User");
+const { validationResult } = require("express-validator");
+const userServices = require("../../src/services/user-services");
 
 const getProfile = async (req, res) => {
     try {
-        const user = req.user;
+        const user = await userServices.getProfile(req);
         res.status(200).json(user);
     }catch(err) {
         console.log(err);
@@ -13,7 +14,7 @@ const getProfile = async (req, res) => {
 
 const getFeed = async (req, res) => {
     try {
-        const users = await User.find({});
+        const users = await userServices.getFeed(req);
         res.status(200).json(users);
     } catch(err) {
         console.log("Error while creating user: ", err.message);
@@ -21,23 +22,17 @@ const getFeed = async (req, res) => {
     }
 };
 
-const updateUser = async (req, res) => {
+const editProfile = async (req, res) => {
 
     try {
 
-        const userId = req.params.userId;
-        const input = req.body;
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            throw new HttpError(errors?.array()[0].msg, 400);
+        }
 
-        const user = await User.findOneAndUpdate(
-            { id: userId },
-            {
-                $set: input
-            },
-            {
-                returnDocument: "after",
-                runValidators: true
-            }
-        );
+        const user = await userServices.editProfile(req.body, req.user.id);
+
         res.status(200).json({ user });
     } catch(err) {
         console.log(err.message);
@@ -48,5 +43,5 @@ const updateUser = async (req, res) => {
 module.exports = {
     getProfile,
     getFeed,
-    updateUser
+    editProfile
 }

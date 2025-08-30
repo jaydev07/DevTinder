@@ -8,7 +8,7 @@ const userAuth = async (req, res, next) => {
         // Check if the jwt token is present in the cookie
         const { token } = req.cookies;
         if (!token) {
-            throw new HttpError('Token not found', 401);
+            throw new HttpError('Token is not valid', 401);
         }
 
         // Verified the jwt and Decoded the information
@@ -23,7 +23,7 @@ const userAuth = async (req, res, next) => {
         // Attached user object in the request and called the next function
         req.user = user;
         next();
-        
+
     } catch(err) {
         console.log("Auth middleware error: ", err);
         throw new HttpError(err.message || 'Internal Server Error', err.status || 500);
