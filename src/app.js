@@ -17,15 +17,14 @@ app.use(cookieParser());
 
 app.post("/signup", [ signupValidation() ], async (req, res) => {
 
-    const errors = validationResult(req);
-
-    if (!errors.isEmpty()) {
-        throw new HttpError(errors?.array()[0].msg, 400); 
-    }
-
-    const input = req.body;
     try {
 
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            throw new HttpError(errors?.array()[0].msg, 400); 
+        }
+
+        const input = req.body;
         const passwordHash = await bcrypt.hash(input.password, 10);
 
         const newUser = new User({
@@ -64,18 +63,16 @@ app.post("/login", async (req, res) => {
             throw new HttpError('Invalid credentials', 401);
         }
         
-        // Verify Password
-        const correctPassword = await bcrypt.compare(password, user.password);
-        if (!correctPassword) {
+        // Validate Password
+        // const correctPassword = await bcrypt.compare(password, user.password);
+        const isPasswordCorrect = await user.validatePassword(password);
+
+        if (!isPasswordCorrect) {
             throw new HttpError('Invalid credentials', 401);
         }
 
         // Create JWT token
-        const token = await jwt.sign(
-            { id: user.id }, 
-            'jaydev', 
-            {  expiresIn: '0d' }
-        );
+        const token = await user.getJWT();
 
         // Send cookie with expiry
         res.status(200)
@@ -92,10 +89,12 @@ app.post("/login", async (req, res) => {
 });
 
 app.patch("/users/:userId", async (req, res) => {
-    const userId = req.params.userId;
-    const input = req.body;
 
     try {
+
+        const userId = req.params.userId;
+        const input = req.body;
+
         const user = await User.findOneAndUpdate(
             { id: userId },
             {
