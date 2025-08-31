@@ -1,4 +1,4 @@
-const { body, param } = require("express-validator");
+const { body, param, query } = require("express-validator");
 const HttpError = require("../../src/utils/http-error");
 
 const signupValidation = () => {
@@ -31,7 +31,20 @@ const editProfileValadation = () => {
     ]
 }
 
+const feedValidation = () => {
+    return [
+        query("count")
+            .exists().withMessage("Count should be greater than 0")
+            .isInt({ min: 1 }).withMessage("Count should be greater than 0"),
+
+        query("page")
+            .exists().withMessage("Page should be greater than 0")
+            .isInt({ min: 1 }).withMessage("Page should be greater than 0"),
+    ]
+}
+
 module.exports = {
     signupValidation,
-    editProfileValadation
+    editProfileValadation,
+    feedValidation
 }

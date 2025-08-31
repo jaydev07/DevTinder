@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const HttpError = require("../../src/utils/http-error");
 const User = require("../models/User");
 const ConnectionRequest = require("../../src/models/ConnectionRequest");
@@ -11,9 +12,59 @@ const getProfile = async (input) => {
     }
 };
 
-const getFeed = async (input) => {
+const getFeed = async (userId, count, page) => {
     try {
-        const users = await User.find({});
+
+        // Get all type of connections of User
+        const connectionRequests = await ConnectionRequest.find({
+            $or: [
+                { toUserId: userId },
+                { fromUserId: userId }
+            ]
+        }).select(['toUserId', 'fromUserId']);
+
+        // Get id's of those users to hide them in feed
+        const hideUsers = new Set();
+        connectionRequests.forEach(request => {
+            hideUsers.add(new mongoose.Types.ObjectId(request.fromUserId.toString()));
+            hideUsers.add(new mongoose.Types.ObjectId(request.toUserId.toString()));
+        });
+
+        // Avoid the connected users & owe user
+        // const users = await User.find({
+        //     $and: [
+        //         { _id: { $nin: Array.from(hideUsers)} },
+        //         { _id: { $ne: userId } }
+        //     ]
+        // }).select(["firstName", "lastName", "age", "gender", "skills", "photoUrl"]);
+
+        const users = await User.aggregate([
+            {
+                $match: {
+                    $and: [
+                        { _id: { $nin: Array.from(hideUsers) } },
+                        { _id: { $ne: new mongoose.Types.ObjectId(userId) } }
+                    ]
+                }
+            },
+            {
+                $skip: count * (page - 1)
+            },
+            {
+                $limit: count
+            },
+            {
+                $project: {
+                    firstName: 1,
+                    lastName: 1,
+                    age: 1,
+                    gender: 1,
+                    skills: 1,
+                    photoUrl: 1
+                }
+            }
+        ])
+
         return users;
     } catch(err) {
         throw new HttpError(err.message || "internal Server Error", err.status || 500);
@@ -41,6 +92,7 @@ const editProfile = async (input, userId) => {
 
 const getRequests = async (userId) => {
     try {
+        
         // const requests = await ConnectionRequest.find({
         //     toUserId: userId,
         //     status: "interested"

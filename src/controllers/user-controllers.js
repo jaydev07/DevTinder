@@ -15,7 +15,17 @@ const getProfile = async (req, res) => {
 
 const getFeed = async (req, res) => {
     try {
-        const users = await userServices.getFeed(req);
+
+        const errors = validationResult(req);
+        if( !errors.isEmpty()) {
+            throw new HttpError(errors.array()[0].msg, 400);
+        }
+
+        const page = parseInt(req.query?.page) || 1;
+        let count = parseInt(req.query?.count) || 10;
+        count = count > 50 ? 50 : count;
+
+        const users = await userServices.getFeed(req.user._id, count, page);
         res.status(200).json(users);
     } catch(err) {
         throw new HttpError(err.message, err.status);
