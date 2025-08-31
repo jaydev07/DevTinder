@@ -14,8 +14,6 @@ const sendRequest = async (req, res) => {
         const status = req.params?.status;
         const fromUserId = req.user._id;
 
-        console.log(toUserId, fromUserId, status, req.user);
-
         if (toUserId == fromUserId) {
             throw new HttpError('User cannot send the connection request to himself', 400);
         }

@@ -1,6 +1,7 @@
 const HttpError = require("../../src/utils/http-error");
 const { validationResult } = require("express-validator");
 const userServices = require("../../src/services/user-services");
+const { json } = require("express");
 
 const getProfile = async (req, res) => {
     try {
@@ -39,8 +40,20 @@ const editProfile = async (req, res) => {
     }
 };
 
+const getRequests = async (req, res) => {
+    try {
+
+        const requests = await userServices.getRequests(req.user._id);
+
+        res.status(200).json(requests);
+    }catch(err) {
+        throw new HttpError(err.message, err.status);
+    }
+}
+
 module.exports = {
     getProfile,
     getFeed,
-    editProfile
+    editProfile,
+    getRequests
 }
