@@ -61,6 +61,38 @@ const sendRequest = async (fromUserId, toUserId, status) => {
     }
 }
 
+const reviewRequest = async (status, connectionRequestId, userId) => {
+    try {
+
+        // const connectionRequest = await ConnectionRequest.findOne({
+        //     _id: connectionRequestId,
+        //     toUserId: userId
+        // });
+        // if (!connectionRequest) {
+        //     throw new HttpError('Connection request donot exists', 500);
+        // }
+
+        // connectionRequest.status = status;
+        // await connectionRequest.save();
+
+        const connectionRequest = await ConnectionRequest.findOneAndUpdate(
+            { _id: connectionRequestId, toUserId: userId, status: 'interested' },
+            { $set: { status: status } },
+            { returnDocument: "after" }
+        ).populate('fromUserId');
+
+        if (!connectionRequest) {
+            throw new HttpError('Connection request donot exists', 500);
+        }
+
+        return connectionRequest;
+
+    }catch(err) {
+        throw new HttpError(err.message, 500);
+    }
+}
+
 module.exports = {
-    sendRequest
+    sendRequest,
+    reviewRequest
 }

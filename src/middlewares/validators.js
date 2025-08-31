@@ -37,18 +37,35 @@ const sendConnectionRequestValidation = () => {
             .custom(status => {
                 const validStatus = ['interested', 'ignored'];
                 if (!validStatus.includes(status)) {
-                    throw new HttpError(`Status: ${status} is invalid`)
+                    throw new HttpError(`Status: ${status} is invalid`, 400)
                 }
                 return true;
             }),
 
         param("toUserId")
-            .isMongoId().withMessage("Invalid Mongo userId")
+            .isMongoId().withMessage("Invalid user id")
+    ]
+}
+
+const reviewRequestValidation = () => {
+    return [
+        param('status')
+            .custom(status => {
+                const validStatus = ['accepted', 'rejected'];
+                if (!validStatus.includes(status)) {
+                    throw new HttpError(`Status: ${status} is invalid`, 400)
+                }
+                return true;
+            }),
+
+        param('connectionRequestId')
+            .isMongoId().withMessage('Invalid connection request id')
     ]
 }
 
 module.exports = {
     signupValidation,
     editProfileValadation,
-    sendConnectionRequestValidation
+    sendConnectionRequestValidation,
+    reviewRequestValidation
 }
