@@ -33,7 +33,7 @@ const login = async (req, res) => {
                 'token', 
                 token, 
                 { expires: new Date(Date.now() + 3600000) }
-            ).json({ user });
+            ).json(user);
 
     } catch(err) {
         throw new HttpError(err.message, err.status);
