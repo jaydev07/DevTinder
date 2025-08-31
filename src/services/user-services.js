@@ -95,9 +95,37 @@ const getRequests = async (userId) => {
     }
 }
 
+const getConnections = async (userId) => {
+    try {
+
+        const connections = await ConnectionRequest.find({
+            $or: [
+                { toUserId: userId },
+                { fromUserId: userId }
+            ],
+            status: "accepted"
+        })
+        .populate('fromUserId', ['_id', 'firstName', 'lastName', 'age', 'photoUrl', 'skills', 'gender'])
+        .populate('toUserId', ['_id', 'firstName', 'lastName', 'age', 'photoUrl', 'skills', 'gender']);
+
+        const data = connections.map(row => {
+            console.log(row.fromUserId, userId);
+            if (row.fromUserId._id.toString() === userId.toString()) {
+                return row.toUserId;
+            }
+            return row.fromUserId;
+        });
+
+        return data;
+    }catch(err) {
+        throw new HttpError(err.message, 500);
+    }
+}
+
 module.exports = {
     getProfile,
     getFeed,
     editProfile,
-    getRequests
+    getRequests,
+    getConnections
 }

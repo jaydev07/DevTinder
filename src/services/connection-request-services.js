@@ -20,7 +20,8 @@ const sendRequest = async (fromUserId, toUserId, status) => {
                 $or: [
                     { fromUserId, toUserId },
                     { fromUserId: toUserId, toUserId: fromUserId}
-                ]
+                ],
+                status: status
             });
             if (request) {
                 reject(new HttpError("Connection request already exists", 500));

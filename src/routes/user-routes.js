@@ -12,4 +12,6 @@ router.patch("/profile/edit", userAuth, [ editProfileValadation() ], userControl
 
 router.get("/requests/received", userAuth, userController.getRequests);
 
+router.get("/connections", userAuth, userController.getConnections);
+
 module.exports = router;

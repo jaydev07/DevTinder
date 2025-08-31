@@ -51,9 +51,21 @@ const getRequests = async (req, res) => {
     }
 }
 
+const getConnections = async (req, res) => {
+    try {
+        const connections = await userServices.getConnections(req.user.id);
+
+        res.status(200).json(connections);
+    }catch(err) {
+        throw new HttpError(err.message, err.status);
+    }
+
+}
+
 module.exports = {
     getProfile,
     getFeed,
     editProfile,
-    getRequests
+    getRequests,
+    getConnections
 }
