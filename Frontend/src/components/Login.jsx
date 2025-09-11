@@ -1,23 +1,31 @@
 import React from 'react'
 import axios from 'axios'
 import { useState } from 'react'
+import { useDispatch } from 'react-redux';
+import { addUser } from '../utils/userSlice';
+import { useNavigate } from 'react-router-dom';
+import { BASE_URL } from '../utils/constants';
 
 const Login = () => {
 
     const [email, setEmail] = useState('jaydev@gmail.com');
     const [password, setPassword] = useState('jaydev@123');
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const handleLogin = async () => {
+        
         try {
             // NOTE: Make sure to send "withCredentials" option, to store the cookie in the browser
-            const response = await axios.post('http://localhost:3000/auth/login', {
+            const response = await axios.post(BASE_URL + '/auth/login', {
                 email,
                 password
             }, { 
                 withCredentials: true 
             });
 
-            console.log(response.data);
+            dispatch(addUser(response.data));
+            navigate("/");
         }catch(err) {
             console.log(err);
         }
